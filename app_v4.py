@@ -66,8 +66,8 @@ st.markdown("""
 # CONEXÃO SUPABASE
 # =========================
 # IMPORTANTE: Substitua pelas suas credenciais reais
-url = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
-key = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
+url = st.secrets.get("https://qkjukxdnufuvrzezrxue.supabase.co") or os.getenv("https://qkjukxdnufuvrzezrxue.supabase.co")
+key = st.secrets.get("sb_publishable_OYkUUp3VGWDWL3ztH8zqig_sZrkIY8R") or os.getenv("sb_publishable_OYkUUp3VGWDWL3ztH8zqig_sZrkIY8RY")
 
 @st.cache_resource
 def get_supabase():
