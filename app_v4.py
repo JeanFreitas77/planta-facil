@@ -27,7 +27,11 @@ st.markdown("""
     .stButton>button { width: 100%; border-radius: 10px; height: 3.2em; background-color: #2e7d32; color: white; font-weight: bold; border: none; transition: 0.3s; }
     .stButton>button:hover { background-color: #1b5e20; transform: translateY(-2px); }
     .stMetric { background-color: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; }
-    [data-testid="stSidebar"] { background-color: #1b5e20; color: white; }
+    [data-testid="stSidebar"] { background-color: #1b5e20; }
+    [data-testid="stSidebar"] * { color: white !important; }
+    /* Ajuste para garantir que o texto das opções do Radio Button e Selectbox apareça */
+    [data-testid="stSidebar"] .stRadio label, [data-testid="stSidebar"] .stSelectbox label { color: white !important; }
+    [data-testid="stSidebar"] div[role="radiogroup"] { color: white !important; }
     .footer { position: fixed; left: 0; bottom: 0; width: 100%; background-color: white; color: #6c757d; text-align: center; padding: 12px; font-size: 13px; border-top: 1px solid #dee2e6; z-index: 100; }
     .stDataFrame {
     background-color: white;
