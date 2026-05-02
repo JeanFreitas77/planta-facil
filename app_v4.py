@@ -185,21 +185,23 @@ def generate_pdf(df_est, df_ven, resumo):
     pdf.set_font("Arial", "B", 10)
     pdf.set_fill_color(255, 224, 178)
 
-    pdf.cell(50, 8, "Data", border=1, fill=True)
-    pdf.cell(50, 8, "Planta", border=1, fill=True)
-    pdf.cell(30, 8, "Qtd", border=1, fill=True)
-    pdf.cell(50, 8, "Total", border=1, ln=True, fill=True)
-
+    pdf.cell(35, 8, "Data", border=1, fill=True)
+    pdf.cell(45, 8, "Planta", border=1, fill=True)
+    pdf.cell(20, 8, "Qtd", border=1, fill=True)
+    pdf.cell(40, 8, "Total", border=1, ln=True, fill=True)
+    pdf.cell(50, 8, "Cliente", border=1, ln=True, fill=True)
+    
     pdf.set_font("Arial", "", 9)
 
     for _, row in df_ven.tail(10).iterrows():
         total = float(row.get('quantidade', 0)) * float(row.get('preco', 0))
 
-        pdf.cell(50, 8, format_date_br(row.get('data_venda', '')), border=1)
-        pdf.cell(50, 8, str(row.get('planta', '-')), border=1)
-        pdf.cell(30, 8, str(row.get('quantidade', 0)), border=1)
-        pdf.cell(50, 8, format_currency(total), border=1, ln=True)
-
+        pdf.cell(35, 8, format_date_br(row.get('data_venda', '')), border=1)
+        pdf.cell(45, 8, str(row.get('planta', '-')), border=1)
+        pdf.cell(20, 8, str(row.get('quantidade', 0)), border=1)
+        pdf.cell(40, 8, format_currency(total), border=1, ln=True)
+        pdf.cell(50, 8, cliente, border=1, ln=True)
+        
     return pdf.output(dest="S").encode("latin-1")
 
 def verificar_usuario_ativo(supabase, user_id, email):
