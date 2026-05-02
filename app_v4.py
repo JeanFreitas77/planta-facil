@@ -241,8 +241,14 @@ if st.session_state.user is None:
         st.markdown("<h1 style='text-align: center; color: #2e7d32; white-space:nowrap'>🌱 PlantaFácil</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; color: #666;'>Gerenciador PlantaFácil</p>", unsafe_allow_html=True)
         
-        with st.container(border=True):
-                        # --- NOVO BLOCO DE LOGIN E CADASTRO ---
+                with st.container(border=True):
+            # 1. Primeiro definimos as variáveis (isso evita o erro 'not defined')
+            email = st.text_input("E-mail", placeholder="seu@email.com")
+            senha = st.text_input("Senha", type="password", placeholder="******")
+            
+            st.write("") # Espaço visual
+            
+            # 2. Depois criamos as colunas com os botões
             col_login, col_cadastro = st.columns(2)
             
             with col_login:
@@ -253,46 +259,45 @@ if st.session_state.user is None:
                                 "email": email,
                                 "password": senha
                             })
-
                             if resposta and resposta.user:
                                 user_id = resposta.user.id
-                                ativo = verificar_usuario_ativo(supabase, user_id, email)
-                                if not ativo:
-                                    st.error("Seu acesso está inativo. Entre em contato.")
-                                    st.stop()
-                                st.session_state.user = user_id
-                                st.success("Bem-vindo!")
-                                st.rerun()
+                                if verificar_usuario_ativo(supabase, user_id, email):
+                                    st.session_state.user = user_id
+                                    st.success("Bem-vindo!")
+                                    st.rerun()
+                                else:
+                                    st.error("Seu acesso está inativo.")
                             else:
                                 st.error("E-mail ou senha incorretos.")
                         except Exception as e:
                             st.error(f"Erro ao conectar: {e}")
                     else:
-                        st.warning("Aguardando configuração do Supabase...")
+                        st.warning("Configuração do Supabase não encontrada.")
 
             with col_cadastro:
                 if st.button("Criar Nova Conta"):
                     if not email or not senha:
-                        st.warning("Preencha e-mail e senha para cadastrar.")
+                        st.warning("Preencha e-mail e senha.")
                     elif len(senha) < 6:
-                        st.error("A senha deve ter pelo menos 6 caracteres.")
+                        st.error("A senha deve ter 6+ caracteres.")
                     else:
                         try:
-                            # 1. Cria o usuário na autenticação do Supabase
                             resp = supabase.auth.sign_up({"email": email, "password": senha})
-                            if resp.user:
-                                # 2. Registra na sua tabela 'usuarios' como ativo
-                                supabase.table("usuarios").insert({
-                                    "id": resp.user.id,
-                                    "email": email,
-                                    "ativo": True
-                                }).execute()
-                                st.success("Conta criada com sucesso! Agora clique em 'Acessar Painel'.")
+                            if resp and resp.user:
+                                try:
+                                    supabase.table("usuarios").insert({
+                                        "id": resp.user.id,
+                                        "email": email,
+                                        "ativo": True
+                                    }).execute()
+                                except:
+                                    pass
+                                st.success("Conta criada! Agora clique em 'Acessar Painel'.")
                             else:
-                                st.error("Erro ao criar conta. Verifique se o e-mail já existe.")
+                                st.error("Erro ao criar conta.")
                         except Exception as e:
                             st.error(f"Erro no cadastro: {e}")
-            # --- FIM DO NOVO BLOCO ---
+
 
 
                     
