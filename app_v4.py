@@ -241,24 +241,19 @@ if st.session_state.user is None:
         st.markdown("<h1 style='text-align: center; color: #2e7d32; white-space:nowrap'>🌱 PlantaFácil</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; color: #666;'>Gerenciador PlantaFácil</p>", unsafe_allow_html=True)
         
-                with st.container(border=True):
-            # 1. Primeiro definimos as variáveis (isso evita o erro 'not defined')
+        with st.container(border=True):
             email = st.text_input("E-mail", placeholder="seu@email.com")
             senha = st.text_input("Senha", type="password", placeholder="******")
             
-            st.write("") # Espaço visual
+            st.write("")
             
-            # 2. Depois criamos as colunas com os botões
-            col_login, col_cadastro = st.columns(2)
+            col_l, col_c = st.columns(2)
             
-            with col_login:
+            with col_l:
                 if st.button("Acessar Painel"):
                     if supabase:
                         try:
-                            resposta = supabase.auth.sign_in_with_password({
-                                "email": email,
-                                "password": senha
-                            })
+                            resposta = supabase.auth.sign_in_with_password({"email": email, "password": senha})
                             if resposta and resposta.user:
                                 user_id = resposta.user.id
                                 if verificar_usuario_ativo(supabase, user_id, email):
@@ -272,9 +267,9 @@ if st.session_state.user is None:
                         except Exception as e:
                             st.error(f"Erro ao conectar: {e}")
                     else:
-                        st.warning("Configuração do Supabase não encontrada.")
+                        st.warning("Configuração do Supabase pendente.")
 
-            with col_cadastro:
+            with col_c:
                 if st.button("Criar Nova Conta"):
                     if not email or not senha:
                         st.warning("Preencha e-mail e senha.")
@@ -285,18 +280,15 @@ if st.session_state.user is None:
                             resp = supabase.auth.sign_up({"email": email, "password": senha})
                             if resp and resp.user:
                                 try:
-                                    supabase.table("usuarios").insert({
-                                        "id": resp.user.id,
-                                        "email": email,
-                                        "ativo": True
-                                    }).execute()
+                                    supabase.table("usuarios").insert({"id": resp.user.id, "email": email, "ativo": True}).execute()
                                 except:
                                     pass
-                                st.success("Conta criada! Agora clique em 'Acessar Painel'.")
+                                st.success("Conta criada! Tente logar.")
                             else:
                                 st.error("Erro ao criar conta.")
                         except Exception as e:
                             st.error(f"Erro no cadastro: {e}")
+
 
 
 
