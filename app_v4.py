@@ -242,35 +242,58 @@ if st.session_state.user is None:
         st.markdown("<p style='text-align: center; color: #666;'>Gerenciador PlantaFácil</p>", unsafe_allow_html=True)
         
         with st.container(border=True):
-            # A ordem de declaração garante que o TAB funcione corretamente: Email -> Senha -> Botão
-            email = st.text_input("E-mail", placeholder="seu@email.com")
-            senha = st.text_input("Senha", type="password", placeholder="******")
+                        # --- NOVO BLOCO DE LOGIN E CADASTRO ---
+            col_login, col_cadastro = st.columns(2)
             
-            if st.button("Acessar Painel"):
-                if supabase:
-                    try:
-                        resposta = supabase.auth.sign_in_with_password({
-                            "email": email,
-                            "password": senha
-                        })
+            with col_login:
+                if st.button("Acessar Painel"):
+                    if supabase:
+                        try:
+                            resposta = supabase.auth.sign_in_with_password({
+                                "email": email,
+                                "password": senha
+                            })
 
-                        if resposta and resposta.user:
-                            user_id = resposta.user.id
+                            if resposta and resposta.user:
+                                user_id = resposta.user.id
+                                ativo = verificar_usuario_ativo(supabase, user_id, email)
+                                if not ativo:
+                                    st.error("Seu acesso está inativo. Entre em contato.")
+                                    st.stop()
+                                st.session_state.user = user_id
+                                st.success("Bem-vindo!")
+                                st.rerun()
+                            else:
+                                st.error("E-mail ou senha incorretos.")
+                        except Exception as e:
+                            st.error(f"Erro ao conectar: {e}")
+                    else:
+                        st.warning("Aguardando configuração do Supabase...")
 
-                            # 🔎 valida se está ativo
-                            ativo = verificar_usuario_ativo(supabase, user_id, email)
+            with col_cadastro:
+                if st.button("Criar Nova Conta"):
+                    if not email or not senha:
+                        st.warning("Preencha e-mail e senha para cadastrar.")
+                    elif len(senha) < 6:
+                        st.error("A senha deve ter pelo menos 6 caracteres.")
+                    else:
+                        try:
+                            # 1. Cria o usuário na autenticação do Supabase
+                            resp = supabase.auth.sign_up({"email": email, "password": senha})
+                            if resp.user:
+                                # 2. Registra na sua tabela 'usuarios' como ativo
+                                supabase.table("usuarios").insert({
+                                    "id": resp.user.id,
+                                    "email": email,
+                                    "ativo": True
+                                }).execute()
+                                st.success("Conta criada com sucesso! Agora clique em 'Acessar Painel'.")
+                            else:
+                                st.error("Erro ao criar conta. Verifique se o e-mail já existe.")
+                        except Exception as e:
+                            st.error(f"Erro no cadastro: {e}")
+            # --- FIM DO NOVO BLOCO ---
 
-                            if not ativo:
-                                st.error("Seu acesso está inativo. Entre em contato.")
-                                st.stop()
-
-                            # acesso liberado
-                            st.session_state.user = user_id
-                            st.success("Bem-vindo!")
-                            st.rerun()
-
-                        else:
-                            st.error("E-mail ou senha incorretos.")
 
                     except Exception as e:
                         st.error(f"Erro ao conectar: {e}")
