@@ -295,15 +295,7 @@ if st.session_state.user is None:
             # --- FIM DO NOVO BLOCO ---
 
 
-                    except Exception as e:
-                        st.error(f"Erro ao conectar: {e}")
-                else:
-                    st.warning("Aguardando configuração do Supabase...")
-                    # Mock para teste rápido (remova em produção)
-                    if email == "admin" and senha == "admin":
-                        st.session_state.user = "demo_user"
-                        st.rerun()
-
+                    
 # =========================
 # ÁREA LOGADA
 # =========================
